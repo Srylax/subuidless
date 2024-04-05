@@ -7,7 +7,7 @@ repository = "https://github.com/rootless-containers/subuidless"
 readme = "README.MD"
 keywords = ["subuid","rootless","container","docker","seccomp"]
 categories = ["virtualization"]
-
+rust-version = "1.77.1"
 
 [dependencies]
 
