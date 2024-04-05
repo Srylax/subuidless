@@ -1,0 +1,27 @@
+{
+  "packages": [
+    "rustup@latest",
+    "libiconv@latest",
+    "docker@latest"
+  ],
+  "env": {
+    "PROJECT_DIR": "$PWD",
+    "DOCKER_HOST": "unix://$XDG_RUNTIME_DIR/docker.sock"
+  },
+  "shell": {
+    "init_hook": [
+      "rustupHomeDir=\"${PROJECT_DIR}/.rustup\"",
+      "mkdir -p \"${rustupHomeDir}\"",
+      "export RUSTUP_HOME=\"${rustupHomeDir}\"",
+      "export LIBRARY_PATH=\"${LIBRARY_PATH}:${PROJECT_DIR}/nix/profile/default/lib\"",
+      "rustup default stable",
+      "cargo fetch",
+      "rustup component add rust-src"
+    ],
+    "scripts": {
+      "test":       "cargo test -- --show-output",
+      "start":      "cargo run",
+      "build-docs": "cargo doc"
+    }
+  }
+}
