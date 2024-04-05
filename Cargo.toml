@@ -2,7 +2,28 @@
 name = "subuidless"
 version = "0.1.0"
 edition = "2021"
+description = "Rootless Containers without `/etc/subuid` and `/etc/subgid`"
+repository = "https://github.com/rootless-containers/subuidless"
+readme = "README.MD"
+keywords = ["subuid","rootless","container","docker","seccomp"]
+categories = ["virtualization"]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+
+
+[lints.rust]
+future_incompatible = "warn"
+nonstandard_style = "warn"
+rust_2018_idioms = "warn"
+unsafe_code = "deny"
+
+[lints.clippy]
+all = "warn"
+pedantic = "warn"
+style = "warn"
+perf = "warn"
+complexity = "warn"
+suspicious = "warn"
+correctness = "warn"
+cargo = "warn"
