@@ -8,6 +8,7 @@ readme = "README.MD"
 keywords = ["subuid","rootless","container","docker","seccomp"]
 categories = ["virtualization"]
 rust-version = "1.77.1"
+license = "AGPL-3.0-or-later"
 
 [dependencies]
 

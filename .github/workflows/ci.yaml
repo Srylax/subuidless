@@ -105,6 +105,7 @@ jobs:
     name: clippy
     runs-on: ubuntu-latest
     permissions:
+      contents: read
       security-events: write # to upload sarif results
     steps:
       - name: Checkout repository
