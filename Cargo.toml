@@ -29,3 +29,4 @@ suspicious = "warn"
 correctness = "warn"
 cargo = "warn"
 restriction = "warn"
+blanket_clippy_restriction_lints = "allow" # restriction as whitelist instead of blacklist
