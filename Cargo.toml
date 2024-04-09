@@ -5,12 +5,18 @@ edition = "2021"
 description = "Rootless Containers without `/etc/subuid` and `/etc/subgid`"
 repository = "https://github.com/rootless-containers/subuidless"
 readme = "README.MD"
-keywords = ["subuid","rootless","container","docker","seccomp"]
+keywords = ["subuid", "rootless", "container", "docker", "seccomp"]
 categories = ["virtualization"]
 rust-version = "1.77.1"
 license = "AGPL-3.0-or-later"
 
 [dependencies]
+libc = "0.2.153"
+protobuf = "3.4.0"
+xattr = "1.3.1"
+
+[build-dependencies]
+protobuf-codegen = "3.4.0"
 
 
 [lints.rust]
@@ -19,105 +25,23 @@ nonstandard_style = "warn"
 rust_2018_idioms = "warn"
 unsafe_code = "deny"
 non-ascii-idents = "deny"
+missing_docs = "warn"
 
 [lints.clippy]
 all = "warn"
 pedantic = "warn"
+similar_names = { level = "allow", priority = 1 }
+missing_errors_doc = { level = "allow", priority = 1 }
 style = "warn"
 perf = "warn"
 complexity = "warn"
 suspicious = "warn"
 correctness = "warn"
 cargo = "warn"
-pub_without_shorthand = "warn" # use always with shorthand
-absolute_paths = "warn"
-allow_attributes = "warn"
-allow_attributes_without_reason = "warn"
-arithmetic_side_effects = "deny"
-as_conversions = "deny"
-as_underscore = "deny"
-assertions_on_result_states = "warn"
-clone_on_ref_ptr = "warn"
-create_dir = "warn"
-dbg_macro = "warn"
-decimal_literal_representation = "warn"
-default_numeric_fallback = "warn"
-default_union_representation = "warn"
-deref_by_slicing = "warn"
-empty_drop = "warn"
-empty_enum_variants_with_brackets = "warn"
-empty_structs_with_brackets = "warn"
-error_impl_error = "warn"
-exhaustive_enums = "warn" # remove on 1.0.0
-exhaustive_structs = "warn" # remove on 1.0.0
-exit = "deny"
-expect_used = "deny"
-filetype_is_file = "warn"
-float_arithmetic = "warn"
-float_cmp_const = "warn"
-fn_to_numeric_cast_any = "warn"
-format_push_string = "warn"
-get_unwrap = "warn"
-if_then_some_else_none = "warn"
-impl_trait_in_params = "warn"
-indexing_slicing = "warn"
-infinite_loop = "warn"
-integer_division = "warn"
-integer_division_remainder_used = "warn"
-iter_over_hash_type = "warn"
-large_include_file = "warn"
-let_underscore_must_use = "warn"
-let_underscore_untyped = "warn"
-lossy_float_literal = "warn"
-map_err_ignore = "warn"
-mem_forget = "deny"
-min_ident_chars = "warn"
-missing_assert_message = "warn"
-missing_asserts_for_indexing = "warn"
-missing_docs_in_private_items = "warn"
-mixed_read_write_in_expression = "warn"
-mod_module_files = "warn"
-modulo_arithmetic = "warn"
-multiple_inherent_impl = "warn"
-multiple_unsafe_ops_per_block = "deny"
-mutex_atomic = "warn"
-needless_raw_strings = "warn"
-non_ascii_literal = "warn"
-panic = "deny"
-panic_in_result_fn = "deny"
-partial_pub_fields = "warn"
-print_stderr = "warn"
-print_stdout = "warn"
-rc_buffer = "warn"
-rc_mutex = "warn"
-redundant_type_annotations = "warn"
-ref_patterns = "warn"
-rest_pat_in_fully_bound_structs = "warn"
-same_name_method = "warn"
-semicolon_outside_block = "warn"
-str_to_string = "warn"
-string_add = "warn"
-string_lit_chars_any = "warn"
-string_slice = "warn"
-string_to_string = "warn"
-suspicious_xor_used_as_pow = "warn"
-tests_outside_test_module = "warn"
-todo = "warn"
-try_err = "warn"
-undocumented_unsafe_blocks = "deny"
-unimplemented = "warn"
-unnecessary_safety_comment = "warn"
-unnecessary_safety_doc = "warn"
-unnecessary_self_imports = "warn"
-unneeded_field_pattern = "warn"
-unreachable = "warn"
-unseparated_literal_suffix = "warn"
-unwrap_in_result = "warn"
-unwrap_used = "warn"
-use_debug = "warn"
-verbose_file_reads = "warn"
-wildcard_enum_match_arm = "warn"
-
-
-
-
+restriction = "warn"
+blanket_clippy_restriction_lints = { level = "allow", priority = 1 }
+mod_module_files = { level = "allow", priority = 1 }
+missing_docs_in_private_items = { level = "allow", priority = 1 }
+missing_inline_in_public_items = { level = "allow", priority = 1 }
+implicit_return = { level = "allow", priority = 1 }
+question_mark_used = { level = "allow", priority = 1 }
