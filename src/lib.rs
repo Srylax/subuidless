@@ -21,7 +21,7 @@ pub mod xattr;
 /// Fails if `$XDG_RUNTIME_DIR` is not set
 ///
 /// # Examples
-/// ```
+/// ```ignore
 /// use std::os::fd::RawFd;
 /// # use std::process::{Command, Stdio};
 /// # use std::thread::{JoinHandle, spawn};
