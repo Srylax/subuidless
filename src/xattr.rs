@@ -19,7 +19,7 @@ pub trait XaUser {
     /// # Examples
     ///
     /// ```
-    /// use std::fs::{File};
+    /// use std::fs::File;
     /// use subuidless::xattr::XaUser;
     ///
     /// fn main() -> std::io::Result<()> {
@@ -27,7 +27,6 @@ pub trait XaUser {
     ///     file.set_xa_user(1000, 1000)?;
     ///     Ok(())
     /// }
-    ///
     /// ```
     fn set_xa_user(&self, uid: uid_t, gid: gid_t) -> io::Result<()>;
 
@@ -37,7 +36,7 @@ pub trait XaUser {
     /// # Examples
     ///
     /// ```
-    /// use std::fs::{File};
+    /// use std::fs::File;
     /// use subuidless::xattr::XaUser;
     ///
     /// fn main() -> std::io::Result<()> {
@@ -48,7 +47,6 @@ pub trait XaUser {
     ///     assert_eq!(gid, 1000);
     ///     Ok(())
     /// }
-    ///
     /// ```
     fn get_xa_user(&self) -> io::Result<(uid_t, gid_t)>;
 }

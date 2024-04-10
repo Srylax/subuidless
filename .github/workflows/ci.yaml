@@ -23,7 +23,7 @@ jobs:
     permissions:
       contents: none
     name: CI
-    needs: [test, msrv, lockfile, docs, rustfmt, clippy]
+    needs: [ test, msrv, lockfile, docs, rustfmt, clippy ]
     runs-on: ubuntu-latest
     if: "always()"
     steps:
@@ -42,6 +42,8 @@ jobs:
           toolchain: stable
       - uses: Swatinem/rust-cache@v2
       - uses: taiki-e/install-action@cargo-hack
+      - name: Install libseccomp
+        run: sudo apt install -y libseccomp-dev
       - name: Build
         run: cargo test --no-run
       - name: Test
@@ -58,6 +60,8 @@ jobs:
           toolchain: stable
       - uses: Swatinem/rust-cache@v2
       - uses: taiki-e/install-action@cargo-hack
+      - name: Install libseccomp
+        run: sudo apt install -y libseccomp-dev
       - name: Default features
         run: cargo hack check --feature-powerset --locked --rust-version --ignore-private --all-targets
   lockfile:
@@ -70,6 +74,8 @@ jobs:
         with:
           toolchain: stable
       - uses: Swatinem/rust-cache@v2
+      - name: Install libseccomp
+        run: sudo apt install -y libseccomp-dev
       - name: "Is lockfile updated?"
         run: cargo update --locked
   docs:
@@ -83,6 +89,8 @@ jobs:
         with:
           toolchain: stable
       - uses: Swatinem/rust-cache@v2
+      - name: Install libseccomp
+        run: sudo apt install -y libseccomp-dev
       - name: Check documentation
         env:
           RUSTDOCFLAGS: -D warnings
@@ -99,8 +107,10 @@ jobs:
           toolchain: stable
           components: rustfmt
       - uses: Swatinem/rust-cache@v2
+      - name: Install libseccomp
+        run: sudo apt install -y libseccomp-dev
       - name: Check formatting
-        run: cargo fmt --all -- --check
+        run: cargo fmt --all -- --check --config format_code_in_doc_comments=true
   clippy:
     name: clippy
     runs-on: ubuntu-latest
@@ -121,6 +131,8 @@ jobs:
         run: cargo install clippy-sarif --locked
       - name: Install SARIF tools
         run: cargo install sarif-fmt --locked
+      - name: Install libseccomp
+        run: sudo apt install -y libseccomp-dev
       - name: Check
         run: >
           cargo clippy --all-features --all-targets --message-format=json -- -D warnings

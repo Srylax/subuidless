@@ -26,9 +26,9 @@ pub mod xattr;
 /// # use std::process::{Command, Stdio};
 /// # use std::thread::{JoinHandle, spawn};
 /// # use anyhow::Result;
+/// use libseccomp::ScmpNotifReq;
 /// use sendfd::RecvWithFd;
 /// use subuidless::create_socket;
-///  use libseccomp::ScmpNotifReq;
 ///
 /// fn main() -> Result<()> {
 ///     let listener = create_socket()?;
