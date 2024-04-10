@@ -1,7 +1,8 @@
 {
   "packages": [
     "rustup@latest",
-    "docker@latest"
+    "docker@latest",
+    "libseccomp.dev"
   ],
   "env": {
     "PROJECT_DIR": "$PWD",
@@ -18,8 +19,8 @@
       "rustup component add rust-src"
     ],
     "scripts": {
-      "test":       "cargo test -- --show-output",
-      "start":      "cargo run",
+      "test": "cargo test -- --show-output",
+      "start": "cargo run",
       "build-docs": "cargo doc"
     }
   }
