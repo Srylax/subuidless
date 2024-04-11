@@ -12,8 +12,8 @@ license = "AGPL-3.0-or-later"
 
 [dependencies]
 anyhow = "1.0.82"
-libc = "0.2.153"
 libseccomp = "0.3.0"
+nix = { version = "0.28.0", features = ["fs", "uio", "process"] }
 protobuf = "3.4.0"
 sendfd = "0.4.3"
 xattr = "1.3.1"
@@ -52,3 +52,7 @@ missing_inline_in_public_items = { level = "allow", priority = 1 }
 implicit_return = { level = "allow", priority = 1 }
 question_mark_used = { level = "allow", priority = 1 }
 separated_literal_suffix = { level = "allow", priority = 1 }
+std_instead_of_alloc = { level = "allow", priority = 1 }
+std_instead_of_core = { level = "allow", priority = 1 }
+missing_trait_methods = { level = "allow", priority = 1 }
+shadow_reuse = { level = "allow", priority = 1 }

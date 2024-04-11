@@ -1,7 +1,7 @@
 use std::fs::File;
 use std::io;
 
-use libc::{gid_t, uid_t};
+use nix::libc::{gid_t, uid_t};
 use protobuf::Message;
 use xattr::FileExt;
 
