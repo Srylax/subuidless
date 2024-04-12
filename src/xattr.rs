@@ -1,78 +1,126 @@
-use std::fs::File;
-use std::io;
+//! Modify the XA User xAttribute
+//! The main purpose of this attribute is to allow for an interoperable and standardised way of emulating persistent syscalls in a rootless container (syscalls such as chown(2) which would ordinarily fail).
+//! <https://github.com/rootless-containers/proto>
+use std::mem::size_of;
 
+use nix::errno::Errno;
 use nix::libc::{gid_t, uid_t};
 use protobuf::Message;
-use xattr::FileExt;
+use rustix::io as rio;
+use rustix::{fs, path};
 
+use crate::error::attach;
 use crate::proto::rootlesscontainers::Resource;
 
 const XA_USER_ROOTLESSCONTAINERS: &str = "user.rootlesscontainers";
 
-/// Modify the XA User xAttribute
-/// The main purpose of this attribute is to allow for an interoperable and standardised way of emulating persistent syscalls in a rootless container (syscalls such as chown(2) which would ordinarily fail).
-/// <https://github.com/rootless-containers/proto>
-pub trait XaUser {
-    /// Set the `XA_USER_ROOTLESSCONTAINERS` xAttribute of a file.
-    /// If the uid & gid are both equal to 0 the xAttribute is removed
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use std::fs::File;
-    /// use subuidless::xattr::XaUser;
-    ///
-    /// fn main() -> std::io::Result<()> {
-    ///     let file = File::create("/tmp/example")?;
-    ///     file.set_xa_user(1000, 1000)?;
-    ///     Ok(())
-    /// }
-    /// ```
-    fn set_xa_user(&self, uid: uid_t, gid: gid_t) -> io::Result<()>;
-
-    /// Get the `XA_USER_ROOTLESSCONTAINERS` xAttribute of a file.  
-    /// If the xAttribute is not set the uid and gid returned are both 0
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use std::fs::File;
-    /// use subuidless::xattr::XaUser;
-    ///
-    /// fn main() -> std::io::Result<()> {
-    ///     let file = File::create("/tmp/example")?;
-    ///     file.set_xa_user(1000, 1000)?;
-    ///     let (uid, gid) = file.get_xa_user()?;
-    ///     assert_eq!(uid, 1000);
-    ///     assert_eq!(gid, 1000);
-    ///     Ok(())
-    /// }
-    /// ```
-    fn get_xa_user(&self) -> io::Result<(uid_t, gid_t)>;
+fn setxattr<P: path::Arg, N: path::Arg>(
+    follow: bool,
+) -> fn(P, N, &[u8], fs::XattrFlags) -> rio::Result<()> {
+    if follow {
+        fs::setxattr
+    } else {
+        fs::lsetxattr
+    }
 }
 
-impl XaUser for File {
-    fn set_xa_user(&self, uid: uid_t, gid: gid_t) -> io::Result<()> {
-        if uid == 0 && gid == 0 {
-            return self.remove_xattr(XA_USER_ROOTLESSCONTAINERS);
+fn removexattr<P: path::Arg, N: path::Arg>(follow: bool) -> fn(P, N) -> rio::Result<()> {
+    if follow {
+        fs::removexattr
+    } else {
+        fs::lremovexattr
+    }
+}
+
+fn getxattr<P: path::Arg, N: path::Arg>(follow: bool) -> fn(P, N, &mut [u8]) -> rio::Result<usize> {
+    if follow {
+        fs::getxattr
+    } else {
+        fs::lgetxattr
+    }
+}
+
+/// Set the `XA_USER_ROOTLESSCONTAINERS` xAttribute of a file.
+/// If the uid & gid are both equal to 0 the xAttribute is removed
+///
+/// # Examples
+///
+/// ```
+/// # use anyhow::Result;
+/// use std::fs::File;
+/// use subuidless::xattr::set_xa_user;
+///
+/// fn main() -> Result<()> {
+///     let _file = File::create("/tmp/example")?;
+///     set_xa_user("/tmp/example", false, 1000, 1000)?;
+///     Ok(())
+/// }
+/// ```
+pub fn set_xa_user<P: path::Arg + Clone>(
+    path: P,
+    follow: bool,
+    uid: uid_t,
+    gid: gid_t,
+) -> Result<(), crate::Error> {
+    if uid == 0 && gid == 0 {
+        removexattr(follow)(path.clone(), XA_USER_ROOTLESSCONTAINERS)?;
+    }
+    let resource = Resource {
+        uid,
+        gid,
+        ..Default::default()
+    };
+
+    setxattr(follow)(
+        path,
+        XA_USER_ROOTLESSCONTAINERS,
+        &resource.write_to_bytes().map_err(attach(Errno::ENOTSUP))?,
+        fs::XattrFlags::empty(),
+    )?;
+
+    Ok(())
+}
+
+/// Get the `XA_USER_ROOTLESSCONTAINERS` xAttribute of a file.
+/// If the xAttribute is not set the uid and gid returned are both 0
+///
+/// # Examples
+///
+/// ```
+/// # use anyhow::Result;
+/// use std::fs::File;
+/// use subuidless::xattr::get_xa_user;
+/// use subuidless::xattr::set_xa_user;
+///
+/// fn main() -> Result<()> {
+///     let _file = File::create("/tmp/example")?;
+///     set_xa_user("/tmp/example", false, 1000, 1000)?;
+///     let (uid, gid) = get_xa_user("/tmp/example", false)?;
+///     assert_eq!(uid, 1000);
+///     assert_eq!(gid, 1000);
+///     Ok(())
+/// }
+/// ```
+pub fn get_xa_user<P: path::Arg + Clone>(
+    path: P,
+    follow: bool,
+) -> Result<(uid_t, gid_t), crate::Error> {
+    let mut buf = vec![0; size_of::<Resource>()];
+
+    let size = match getxattr(follow)(path, XA_USER_ROOTLESSCONTAINERS, &mut buf) {
+        Ok(size) => Ok(size),
+        Err(err) => {
+            if err == rio::Errno::NODATA {
+                return Ok((0, 0));
+            }
+            Err(err)
         }
+    }?;
 
-        let resource = Resource {
-            uid,
-            gid,
-            ..Default::default()
-        };
+    buf.truncate(size);
+    buf.shrink_to_fit();
 
-        self.set_xattr(XA_USER_ROOTLESSCONTAINERS, &resource.write_to_bytes()?)
-    }
+    let resource = Resource::parse_from_bytes(&buf).map_err(attach(Errno::ENOTSUP))?;
 
-    fn get_xa_user(&self) -> io::Result<(uid_t, gid_t)> {
-        Ok(self
-            .get_xattr(XA_USER_ROOTLESSCONTAINERS)?
-            .as_deref()
-            .map(Resource::parse_from_bytes)
-            .map_or(Ok((0, 0)), |res| {
-                res.map(|resource| (resource.uid, resource.gid))
-            })?)
-    }
+    Ok((resource.uid, resource.gid))
 }

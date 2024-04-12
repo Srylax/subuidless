@@ -58,7 +58,8 @@
   "syscalls": [
     {
       "names": [
-        "newfstatat"
+        "newfstatat",
+        "fchownat"
       ],
       "action": "SCMP_ACT_NOTIFY"
     },
@@ -120,7 +121,6 @@
         "fchmodat2",
         "fchown",
         "fchown32",
-        "fchownat",
         "fcntl",
         "fcntl64",
         "fdatasync",
