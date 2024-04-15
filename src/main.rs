@@ -2,15 +2,13 @@
 use std::collections::HashMap;
 use std::ops::Neg;
 use std::os::fd::RawFd;
-use std::path::Path;
 use std::sync::Arc;
-use std::thread::spawn;
 
 use anyhow::Context;
 use libseccomp::{ScmpFd, ScmpNotifReq, ScmpNotifResp, ScmpNotifRespFlags, ScmpSyscall};
 use nix::errno::Errno;
-use nix::sched::{setns, unshare, CloneFlags};
-use nix::unistd::{chdir, fork};
+use nix::sched::{CloneFlags, setns, unshare};
+use nix::unistd::fork;
 use rustix::process as rpr;
 use rustix::process::pidfd_open;
 use sendfd::RecvWithFd;
@@ -76,11 +74,7 @@ fn main() -> anyhow::Result<()> {
                     notif_req.pid = 1;
                 }
             }
-
-            {
-                let syscalls = Arc::clone(&syscalls);
-                spawn(move || handle_scmp_req(fd[0], notif_req, &syscalls));
-            }
+            handle_scmp_req(fd[0], notif_req, &syscalls);
         }
     }
 }
@@ -92,7 +86,6 @@ fn handle_scmp_req(fd: ScmpFd, req: ScmpNotifReq, syscalls: &HashMap<ScmpSyscall
             .context("Syscall not supported")
             .map_err(attach(Errno::ENOSYS))?;
 
-        chdir(Path::new(&format!("/proc/{}/cwd", req.pid)))?;
         syscall.execute(req, fd)?;
 
         Ok::<(), subuidless::Error>(())

@@ -1,9 +1,10 @@
 use std::fs::File;
 use std::os::fd::AsRawFd;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use nix::fcntl::AtFlags;
-use nix::sys::stat::{fstatat, FileStat};
+use nix::sys::stat::{FileStat, fstatat};
+use nix::unistd::chdir;
 
 use crate::mem::RemoteStruct;
 use crate::syscall;
@@ -16,6 +17,9 @@ syscall!(Newfstatat {
     flags: AtFlags
 },
 self {
+    if !self.pathname.is_absolute() {
+        chdir(Path::new(&format!("/proc/{}/cwd", self.req.pid)))?;
+    }
     let follow = !AtFlags::contains(&self.flags, AtFlags::AT_SYMLINK_NOFOLLOW);
 
     let mut stat = fstatat(self.dirfd.map(|file|file.as_raw_fd()), &self.pathname, self.flags)?;

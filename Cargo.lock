@@ -328,7 +328,6 @@ dependencies = [
  "anyhow",
  "inventory",
  "libseccomp",
- "log",
  "nix",
  "protobuf",
  "protobuf-codegen",
