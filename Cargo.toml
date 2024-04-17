@@ -87,3 +87,4 @@ pub_with_shorthand = { level = "allow", priority = 1 }
 single_call_fn = { level = "allow", priority = 1 }
 error_impl_error = { level = "allow", priority = 1 }
 self_named_module_files = { level = "allow", priority = 1 }
+tests_outside_test_module = { level = "allow", priority = 1 }

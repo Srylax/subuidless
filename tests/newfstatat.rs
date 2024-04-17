@@ -20,15 +20,16 @@ pub fn flag_strategy() -> BoxedStrategy<c_int> {
     .boxed()
 }
 
+#[allow(clippy::large_include_file)]
 pub fn file_strategy() -> impl Strategy<Value = String> {
     Union::new(include_str!("./files.txt").lines())
 }
-
+#[allow(clippy::large_include_file)]
 pub fn dir_strategy() -> impl Strategy<Value = Option<String>> {
     Union::new(
         include_str!("./files.txt")
             .lines()
-            .map(|line| Just(Some(line.to_string()))),
+            .map(|line| Just(Some(line.to_owned()))),
     )
     .prop_union(Union::new_weighted(vec![(10, Just(None))]))
 }

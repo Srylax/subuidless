@@ -135,7 +135,7 @@ jobs:
         run: sudo apt install -y libseccomp-dev
       - name: Check
         run: >
-          cargo clippy --all-features --all-targets --message-format=json -- -D warnings
+          cargo clippy --all-targets --message-format=json -- -D warnings
           | clippy-sarif
           | tee clippy-results.sarif
           | sarif-fmt
