@@ -693,7 +693,7 @@ dependencies = [
 [[package]]
 name = "subuidless-test"
 version = "0.1.0"
-source = "git+https://github.com/Srylax/subuidless-test#9c353db4f21489106ad025e44079959bc1b3b178"
+source = "git+https://github.com/Srylax/subuidless-test?rev=9c353db4f21489106ad025e44079959bc1b3b178#9c353db4f21489106ad025e44079959bc1b3b178"
 dependencies = [
  "anyhow",
  "docker-command",
@@ -709,7 +709,7 @@ dependencies = [
 [[package]]
 name = "subuidless-test-proc"
 version = "0.1.0"
-source = "git+https://github.com/Srylax/subuidless-test#9c353db4f21489106ad025e44079959bc1b3b178"
+source = "git+https://github.com/Srylax/subuidless-test?rev=9c353db4f21489106ad025e44079959bc1b3b178#9c353db4f21489106ad025e44079959bc1b3b178"
 dependencies = [
  "copy_dir",
  "docker-command",
