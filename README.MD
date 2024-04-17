@@ -49,9 +49,8 @@ $ docker run -it --security-opt seccomp=seccomp.json alpine:latest
 The UID ang GID are recorded to [the `user.rootlesscontainers` xattr](https://github.com/rootless-containers/proto) of the target file. 
 
 ## Hooked system calls
-- [X] `chownat`
 - [ ] `fchown`
-- [ ] `fchownat`
+- [X] `fchownat`
 - [ ] `lchown`
 
 - [X] `fstatat`
