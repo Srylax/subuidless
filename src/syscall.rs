@@ -2,14 +2,12 @@ use libseccomp::{ScmpFd, ScmpNotifReq, ScmpSyscall};
 
 mod fchownat;
 mod fstatat;
-mod openat;
-
 /// Syscall trait for the `inventory` crate
 /// All Implementation of this trait get collected into a `HashMap` where `ScmpSyscall` is the key
 /// This allows for `O(n)` access when a new `ScmpNotifReq` is received.
 pub trait Syscall: Sync {
     /// Main function of the syscall. Everything the syscall does, happens here
-    fn execute(&self, req: ScmpNotifReq, fd: ScmpFd) -> Result<u64, crate::Error>;
+    fn execute(&self, req: ScmpNotifReq, fd: ScmpFd) -> Result<i64, crate::Error>;
 
     /// Get the associated `ScmpSyscall` - used to build the `HashMap`
     fn get_syscall(&self) -> anyhow::Result<ScmpSyscall>;
@@ -42,11 +40,11 @@ macro_rules! syscall {
                     $($arg),*
                 })
             }
-            fn execute_internal($self: Self) -> Result<u64, $crate::Error> $body
+            fn execute_internal($self: Self) -> Result<i64, $crate::Error> $body
         }
         #[allow(clippy::semicolon_outside_block)]
         impl $crate::syscall::Syscall for $name {
-            fn execute(&self, req: libseccomp::ScmpNotifReq, fd: libseccomp::ScmpFd) -> Result<u64, $crate::Error> {
+            fn execute(&self, req: libseccomp::ScmpNotifReq, fd: libseccomp::ScmpFd) -> Result<i64, $crate::Error> {
                 $crate::arg!(0_usize, req, fd, $($arg: $arg_type),*);
                 SyscallData::new(req, fd, $($arg),*)?.execute_internal()
             }

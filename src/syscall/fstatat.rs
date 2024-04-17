@@ -3,7 +3,7 @@ use std::os::fd::AsRawFd;
 use std::path::{Path, PathBuf};
 
 use nix::fcntl::AtFlags;
-use nix::sys::stat::{FileStat, fstatat};
+use nix::sys::stat::{fstatat, FileStat};
 use nix::unistd::chdir;
 
 use crate::mem::RemoteStruct;

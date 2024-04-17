@@ -7,7 +7,7 @@ use std::sync::Arc;
 use anyhow::Context;
 use libseccomp::{ScmpFd, ScmpNotifReq, ScmpNotifResp, ScmpNotifRespFlags, ScmpSyscall};
 use nix::errno::Errno;
-use nix::sched::{CloneFlags, setns, unshare};
+use nix::sched::{setns, unshare, CloneFlags};
 use nix::unistd::fork;
 use rustix::process as rpr;
 use rustix::process::pidfd_open;
@@ -86,14 +86,12 @@ fn handle_scmp_req(fd: ScmpFd, req: ScmpNotifReq, syscalls: &HashMap<ScmpSyscall
             .context("Syscall not supported")
             .map_err(attach(Errno::ENOSYS))?;
 
-        syscall.execute(req, fd)?;
-
-        Ok::<(), subuidless::Error>(())
+        syscall.execute(req, fd)
     };
 
     #[allow(clippy::expect_used)]
     match syscall() {
-        Ok(()) => ScmpNotifResp::new_val(req.id, 0, ScmpNotifRespFlags::empty()).respond(fd),
+        Ok(val) => ScmpNotifResp::new_val(req.id, val, ScmpNotifRespFlags::empty()).respond(fd),
         Err(err) => {
             ScmpNotifResp::new_error(req.id, i32::from(err).neg(), ScmpNotifRespFlags::empty())
                 .respond(fd)
