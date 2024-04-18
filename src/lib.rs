@@ -67,7 +67,7 @@ pub mod xattr;
 pub fn create_socket() -> Result<UnixListener> {
     let xdg_runtime_dir =
         var("XDG_RUNTIME_DIR").context("Must specify XDG_RUNTIME_DIR for socket Path")?;
-    let socket_path = Path::new(&xdg_runtime_dir).join("subuidless.socket");
+    let socket_path = Path::new(&xdg_runtime_dir).join("subuidless.sock");
 
     if let Err(err) = remove_file(&socket_path) {
         if err.kind() == ErrorKind::NotFound {

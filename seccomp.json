@@ -1,7 +1,7 @@
 {
   "defaultAction": "SCMP_ACT_ERRNO",
   "defaultErrnoRet": 1,
-  "listenerPath": "/run/user/1000/subuidless.socket",
+  "listenerPath": "/run/user/1000/subuidless.sock",
   "archMap": [
     {
       "architecture": "SCMP_ARCH_X86_64",
