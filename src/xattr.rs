@@ -14,32 +14,6 @@ use crate::proto::rootlesscontainers::Resource;
 
 const XA_USER_ROOTLESSCONTAINERS: &str = "user.rootlesscontainers";
 
-fn setxattr<P: path::Arg, N: path::Arg>(
-    follow: bool,
-) -> fn(P, N, &[u8], fs::XattrFlags) -> rio::Result<()> {
-    if follow {
-        fs::setxattr
-    } else {
-        fs::lsetxattr
-    }
-}
-
-fn removexattr<P: path::Arg, N: path::Arg>(follow: bool) -> fn(P, N) -> rio::Result<()> {
-    if follow {
-        fs::removexattr
-    } else {
-        fs::lremovexattr
-    }
-}
-
-fn getxattr<P: path::Arg, N: path::Arg>(follow: bool) -> fn(P, N, &mut [u8]) -> rio::Result<usize> {
-    if follow {
-        fs::getxattr
-    } else {
-        fs::lgetxattr
-    }
-}
-
 /// Set the `XA_USER_ROOTLESSCONTAINERS` xAttribute of a file.
 /// If the uid & gid are both equal to 0 the xAttribute is removed
 ///
@@ -62,8 +36,14 @@ pub fn set_xa_user<P: path::Arg + Clone>(
     uid: uid_t,
     gid: gid_t,
 ) -> Result<(), crate::Error> {
+    let removexattr = if follow {
+        fs::removexattr
+    } else {
+        fs::lremovexattr
+    };
+
     if uid == 0 && gid == 0 {
-        removexattr(follow)(path.clone(), XA_USER_ROOTLESSCONTAINERS)?;
+        removexattr(path.clone(), XA_USER_ROOTLESSCONTAINERS)?;
     }
     let resource = Resource {
         uid,
@@ -71,7 +51,9 @@ pub fn set_xa_user<P: path::Arg + Clone>(
         ..Default::default()
     };
 
-    setxattr(follow)(
+    let setxattr = if follow { fs::setxattr } else { fs::lsetxattr };
+
+    setxattr(
         path,
         XA_USER_ROOTLESSCONTAINERS,
         &resource.write_to_bytes().map_err(attach(Errno::ENOTSUP))?,
@@ -107,7 +89,9 @@ pub fn get_xa_user<P: path::Arg + Clone>(
 ) -> Result<(uid_t, gid_t), crate::Error> {
     let mut buf = vec![0; size_of::<Resource>()];
 
-    let size = match getxattr(follow)(path, XA_USER_ROOTLESSCONTAINERS, &mut buf) {
+    let getxattr = if follow { fs::getxattr } else { fs::lgetxattr };
+
+    let size = match getxattr(path, XA_USER_ROOTLESSCONTAINERS, &mut buf) {
         Ok(size) => Ok(size),
         Err(err) => {
             if err == rio::Errno::NODATA {
